@@ -1,0 +1,13 @@
+package org.typecrafters.teambuild;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class TeambuildApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(TeambuildApplication.class, args);
+	}
+
+}
