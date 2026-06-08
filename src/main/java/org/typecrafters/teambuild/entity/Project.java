@@ -1,26 +1,57 @@
-package org.typecrafters.teambuild.document;
+package org.typecrafters.teambuild.entity;
 
 import java.time.Instant;
 import java.util.Map;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.typecrafters.teambuild.domain.enums.OwnerType;
 import org.typecrafters.teambuild.domain.enums.ProjectStatus;
 
-@Document
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapKeyColumn;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+
+@Entity
+@Table(
+    name = "projects",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_projects_slug", columnNames = "slug")
+    }
+)
 public class Project {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(nullable = false)
     private String name;
     private String description;
-    @Indexed(unique = true)
+    @Column(nullable = false)
     private String slug;
+    @Enumerated(EnumType.STRING)
     private OwnerType ownerType;
+    // Polymorphic FK: refers to User, Team, or Organization depending on ownerType
+    @Column(name = "owner_id")
+    private Long ownerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by_id")
+    private User createdBy;
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "project_details", joinColumns = @JoinColumn(name = "project_id"))
+    @MapKeyColumn(name = "detail_key")
+    @Column(name = "detail_value")
     private Map<String, String> details;
-    private String createdBy;
-    private String ownerId;
+    @Enumerated(EnumType.STRING)
     private ProjectStatus status;
     private Instant createdAt;
     private Instant updatedAt;
@@ -29,15 +60,15 @@ public class Project {
     public Project() { }
 
     public Project(
-        String name, 
-        String description, 
-        String slug, 
-        OwnerType ownerType, 
+        String name,
+        String description,
+        String slug,
+        OwnerType ownerType,
+        Long ownerId,
+        User createdBy,
         Map<String, String> details,
-        String createdBy, 
-        String ownerId, 
-        ProjectStatus status, 
-        Instant createdAt, 
+        ProjectStatus status,
+        Instant createdAt,
         Instant updatedAt,
         Instant deletedAt
     ) {
@@ -45,20 +76,20 @@ public class Project {
         this.description = description;
         this.slug = slug;
         this.ownerType = ownerType;
-        this.details = details;
-        this.createdBy = createdBy;
         this.ownerId = ownerId;
+        this.createdBy = createdBy;
+        this.details = details;
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.deletedAt = deletedAt;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -94,28 +125,28 @@ public class Project {
         this.ownerType = ownerType;
     }
 
+    public Long getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
+    }
+
     public Map<String, String> getDetails() {
         return details;
     }
 
     public void setDetails(Map<String, String> details) {
         this.details = details;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public String getOwnerId() {
-        return ownerId;
-    }
-
-    public void setOwnerId(String ownerId) {
-        this.ownerId = ownerId;
     }
 
     public ProjectStatus getStatus() {

@@ -1,25 +1,49 @@
-package org.typecrafters.teambuild.document;
+package org.typecrafters.teambuild.entity;
 
 import java.time.Instant;
 import java.util.Map;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapKeyColumn;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
-@Document
+@Entity
+@Table(
+    name = "teams",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_teams_slug", columnNames = "slug")
+    }
+)
 public class Team {
     @Id
-    private String id;
-    @Indexed
-    private String organizationId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organization_id", nullable = false)
+    private Organization organization;
+    @Column(nullable = false)
     private String name;
     private String description;
-    @Indexed(unique = true)
+    @Column(nullable = false)
     private String slug;
-    @Indexed
-    private String createdBy;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by_id")
+    private User createdBy;
     private String logoUrl;
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "team_details", joinColumns = @JoinColumn(name = "team_id"))
+    @MapKeyColumn(name = "detail_key")
+    @Column(name = "detail_value")
     private Map<String, String> details;
     private Instant createdAt;
     private Instant updatedAt;
@@ -28,18 +52,18 @@ public class Team {
     public Team() { }
 
     public Team(
-        String organizationId, 
-        String name, 
-        String description, 
-        String slug, 
-        String createdBy, 
+        Organization organization,
+        String name,
+        String description,
+        String slug,
+        User createdBy,
         String logoUrl,
-        Map<String, String> details, 
-        Instant createdAt, 
-        Instant updatedAt, 
+        Map<String, String> details,
+        Instant createdAt,
+        Instant updatedAt,
         Instant deletedAt
     ) {
-        this.organizationId = organizationId;
+        this.organization = organization;
         this.name = name;
         this.description = description;
         this.slug = slug;
@@ -51,20 +75,20 @@ public class Team {
         this.deletedAt = deletedAt;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getOrganizationId() {
-        return organizationId;
+    public Organization getOrganization() {
+        return organization;
     }
 
-    public void setOrganizationId(String organizationId) {
-        this.organizationId = organizationId;
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
     }
 
     public String getName() {
@@ -91,11 +115,11 @@ public class Team {
         this.slug = slug;
     }
 
-    public String getCreatedBy() {
+    public User getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(String createdBy) {
+    public void setCreatedBy(User createdBy) {
         this.createdBy = createdBy;
     }
 

@@ -1,24 +1,48 @@
-package org.typecrafters.teambuild.document;
+package org.typecrafters.teambuild.entity;
 
 import java.time.Instant;
 import java.util.List;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.typecrafters.teambuild.domain.enums.OwnerType;
 
-@Document
-@CompoundIndex(name = "org_role_index", def = "{'ownerType': 1, 'name': 1, 'ownerId': 1}", unique = true, partialFilter = "{'deletedAt': null}")
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OrderColumn;
+import jakarta.persistence.Table;
+
+// The original (ownerType, name, ownerId) unique constraint was partial (WHERE deletedAt IS NULL).
+// Standard JPA @UniqueConstraint cannot express partial indexes, so that constraint must be
+// applied as a conditional index in a schema migration instead of here.
+@Entity
+@Table(name = "roles")
 public class Role {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(nullable = false)
     private String name;
+    @Enumerated(EnumType.STRING)
     private OwnerType ownerType;
-    @Indexed
-    private String ownerId;
-    private String createdBy;
+    // Polymorphic FK: refers to User, Team, or Organization depending on ownerType
+    @Column(name = "owner_id")
+    private Long ownerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by_id")
+    private User createdBy;
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "role_permissions", joinColumns = @JoinColumn(name = "role_id"))
+    @OrderColumn(name = "permission_order")
+    @Column(name = "permission")
     private List<String> permissions;
     private Instant createdAt;
     private Instant updatedAt;
@@ -27,13 +51,13 @@ public class Role {
     public Role() { }
 
     public Role(
-        String name, 
-        OwnerType ownerType, 
-        String ownerId, 
-        String createdBy, 
+        String name,
+        OwnerType ownerType,
+        Long ownerId,
+        User createdBy,
         List<String> permissions,
-        Instant createdAt, 
-        Instant updatedAt, 
+        Instant createdAt,
+        Instant updatedAt,
         Instant deletedAt
     ) {
         this.name = name;
@@ -46,11 +70,11 @@ public class Role {
         this.deletedAt = deletedAt;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -70,19 +94,19 @@ public class Role {
         this.ownerType = ownerType;
     }
 
-    public String getOwnerId() {
+    public Long getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(String ownerId) {
+    public void setOwnerId(Long ownerId) {
         this.ownerId = ownerId;
     }
 
-    public String getCreatedBy() {
+    public User getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(String createdBy) {
+    public void setCreatedBy(User createdBy) {
         this.createdBy = createdBy;
     }
 
@@ -117,5 +141,4 @@ public class Role {
     public void setDeletedAt(Instant deletedAt) {
         this.deletedAt = deletedAt;
     }
-
 }

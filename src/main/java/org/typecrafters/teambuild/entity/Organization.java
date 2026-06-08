@@ -1,26 +1,55 @@
-package org.typecrafters.teambuild.document;
+package org.typecrafters.teambuild.entity;
 
 import java.time.Instant;
 import java.util.Map;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.typecrafters.teambuild.domain.enums.OrganizationStatus;
 
-@Document
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapKeyColumn;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+
+@Entity
+@Table(
+    name = "organizations",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_organizations_slug", columnNames = "slug")
+    }
+)
 public class Organization {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(nullable = false)
     private String name;
     private String description;
-    @Indexed(unique = true)
+    @Column(nullable = false)
     private String slug;
-    private String createdBy;
-    @Indexed
-    private String ownerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by_id")
+    private User createdBy;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private User owner;
     private String logoUrl;
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "organization_details", joinColumns = @JoinColumn(name = "organization_id"))
+    @MapKeyColumn(name = "detail_key")
+    @Column(name = "detail_value")
     private Map<String, String> details;
+    @Enumerated(EnumType.STRING)
     private OrganizationStatus status;
     private Instant createdAt;
     private Instant updatedAt;
@@ -29,15 +58,15 @@ public class Organization {
     public Organization() { }
 
     public Organization(
-        String name, 
-        String description, 
-        String slug, 
-        String createdBy, 
-        String ownerId, 
+        String name,
+        String description,
+        String slug,
+        User createdBy,
+        User owner,
         String logoUrl,
-        Map<String, String> details, 
+        Map<String, String> details,
         OrganizationStatus status,
-        Instant createdAt, 
+        Instant createdAt,
         Instant updatedAt,
         Instant deletedAt
     ) {
@@ -45,7 +74,7 @@ public class Organization {
         this.description = description;
         this.slug = slug;
         this.createdBy = createdBy;
-        this.ownerId = ownerId;
+        this.owner = owner;
         this.logoUrl = logoUrl;
         this.details = details;
         this.status = status;
@@ -54,11 +83,11 @@ public class Organization {
         this.deletedAt = deletedAt;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -86,20 +115,20 @@ public class Organization {
         this.slug = slug;
     }
 
-    public String getCreatedBy() {
+    public User getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(String createdBy) {
+    public void setCreatedBy(User createdBy) {
         this.createdBy = createdBy;
     }
 
-    public String getOwnerId() {
-        return ownerId;
+    public User getOwner() {
+        return owner;
     }
 
-    public void setOwnerId(String ownerId) {
-        this.ownerId = ownerId;
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 
     public String getLogoUrl() {
