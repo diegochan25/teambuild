@@ -4,14 +4,16 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
-import org.typecrafters.teambuild.domain.exception.ApplicationException;
-import org.typecrafters.teambuild.domain.exception.ClientException;
+import org.typecrafters.teambuild.domain.enums.UserStatus;
+import org.typecrafters.teambuild.domain.exception.AppException;
 import org.typecrafters.teambuild.domain.util.TokenGenerator;
 import org.typecrafters.teambuild.entity.Session;
 import org.typecrafters.teambuild.entity.User;
+import org.typecrafters.teambuild.entity.UserProfile;
 import org.typecrafters.teambuild.repository.SessionRepository;
 import org.typecrafters.teambuild.repository.UserRepository;
 
@@ -26,9 +28,10 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
 
     public AuthServiceImpl(
-            UserRepository userRepository,
-            SessionRepository sessionRepository,
-            PasswordEncoder passwordEncoder) {
+        UserRepository userRepository,
+        SessionRepository sessionRepository,
+        PasswordEncoder passwordEncoder
+    ) {
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
         this.passwordEncoder = passwordEncoder;
@@ -36,14 +39,14 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String authenticateUser(
-            String userNameOrEmail,
+            String email,
             String password,
             boolean rememberMe,
             String ipAddress,
             String userAgent) {
-        ClientException unauthorized = new ClientException("Unauthorized.");
+        AppException unauthorized = AppException.unauthorized("Unauthorized.");
 
-        User user = userRepository.findByUserNameOrEmail(userNameOrEmail, userNameOrEmail)
+        User user = userRepository.findByEmail(email)
                 .orElse(null);
 
         if (user == null) {
@@ -70,11 +73,45 @@ public class AuthServiceImpl implements AuthService {
             Session result = sessionRepository.save(session);
             return result.getJsessionid();
         } catch (UnknownHostException e) {
-            throw new ApplicationException(
+            throw AppException.internalServerError(
                 "An unexpected error occurred while transforming the request's IP address to an InetAddress object.",
                 e
             );
         }
+    }
+
+    public User createAccount(
+        String firstName, 
+        String lastName,
+        String email, 
+        String password, 
+        String confirmPassword,
+        boolean newsletterOptIn
+    ) {
+        Optional<User> existing = userRepository.findByEmail(email);
+
+
+        if (!password.equals(confirmPassword)) {
+            throw AppException.badRequest("Passwords do not match.");
+        }
+
+        if (existing.isPresent()) {
+            throw AppException.badRequest("User with this email already exists.");
+        }
+
+        Instant now = Instant.now();
+        User user = new User();
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setEmail(email);
+        user.setPasswordHash(passwordEncoder.encode(password));
+        user.setNewsletterOptIn(newsletterOptIn);
+        user.setStatus(UserStatus.UNVERIFIED);
+        user.setCreatedAt(now);
+        user.setProfile(new UserProfile());
+
+        User result = userRepository.save(user);
+        return result;
     }
 
     @Transactional

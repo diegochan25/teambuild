@@ -1,7 +1,7 @@
 package org.typecrafters.teambuild.dto;
 
 public record LoginRequest(
-    String userNameOrEmail,
+    String email,
     String password,
     boolean rememberMe
 ) { }

@@ -1,13 +1,8 @@
 package org.typecrafters.teambuild.entity;
 
 import java.time.Instant;
-import java.util.Map;
-
 import org.typecrafters.teambuild.domain.enums.OrganizationStatus;
-
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -17,7 +12,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
@@ -32,27 +26,36 @@ public class Organization {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false)
     private String name;
+
     private String description;
+
     @Column(nullable = false)
     private String slug;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by_id")
-    private User createdBy;
+    @JoinColumn(name = "creator_id")
+    private User creator;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private User owner;
+
+    @Column(name = "logo_url")
     private String logoUrl;
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "organization_details", joinColumns = @JoinColumn(name = "organization_id"))
-    @MapKeyColumn(name = "detail_key")
-    @Column(name = "detail_value")
-    private Map<String, String> details;
+
     @Enumerated(EnumType.STRING)
     private OrganizationStatus status;
+
+    @Column(name = "created_at")
     private Instant createdAt;
+
+    @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @Column(name = "deleted_at")
     private Instant deletedAt;
 
     public Organization() { }
@@ -61,10 +64,9 @@ public class Organization {
         String name,
         String description,
         String slug,
-        User createdBy,
+        User creator,
         User owner,
         String logoUrl,
-        Map<String, String> details,
         OrganizationStatus status,
         Instant createdAt,
         Instant updatedAt,
@@ -73,10 +75,9 @@ public class Organization {
         this.name = name;
         this.description = description;
         this.slug = slug;
-        this.createdBy = createdBy;
+        this.creator = creator;
         this.owner = owner;
         this.logoUrl = logoUrl;
-        this.details = details;
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -115,12 +116,12 @@ public class Organization {
         this.slug = slug;
     }
 
-    public User getCreatedBy() {
-        return createdBy;
+    public User getCreator() {
+        return creator;
     }
 
-    public void setCreatedBy(User createdBy) {
-        this.createdBy = createdBy;
+    public void setCreator(User creator) {
+        this.creator = creator;
     }
 
     public User getOwner() {
@@ -137,14 +138,6 @@ public class Organization {
 
     public void setLogoUrl(String logoUrl) {
         this.logoUrl = logoUrl;
-    }
-
-    public Map<String, String> getDetails() {
-        return details;
-    }
-
-    public void setDetails(Map<String, String> details) {
-        this.details = details;
     }
 
     public OrganizationStatus getStatus() {

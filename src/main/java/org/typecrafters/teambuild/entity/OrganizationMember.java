@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.typecrafters.teambuild.domain.enums.InvitationStatus;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -30,13 +31,17 @@ public class OrganizationMember {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organization_id", nullable = false)
     private Organization organization;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
     private String position;
+    
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "organization_member_roles",
@@ -45,9 +50,13 @@ public class OrganizationMember {
     )
     private Set<Role> roles;
     @Enumerated(EnumType.STRING)
+    @Column(name = "invitation_status")
     private InvitationStatus invitationStatus;
+    @Column(name = "invited_at")
     private Instant invitedAt;
+    @Column(name = "joined_at")
     private Instant joinedAt;
+    @Column(name = "left_at")
     private Instant leftAt;
 
     public OrganizationMember() { }

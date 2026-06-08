@@ -3,16 +3,16 @@ package org.typecrafters.teambuild.controller;
 import java.time.Duration;
 
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import org.typecrafters.teambuild.domain.exception.ApplicationException;
-import org.typecrafters.teambuild.domain.exception.ClientException;
+import org.typecrafters.teambuild.domain.enums.AppStatusCode;
+import org.typecrafters.teambuild.domain.exception.AppException;
 import org.typecrafters.teambuild.dto.LoginRequest;
+import org.typecrafters.teambuild.dto.SignupRequest;
 import org.typecrafters.teambuild.service.AuthService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,7 +34,7 @@ public class AuthController {
 
         try {
             String jsessionid = authService.authenticateUser(
-                body.userNameOrEmail(), 
+                body.email(), 
                 body.password(), 
                 body.rememberMe(),
                 ipAddress,
@@ -52,17 +52,25 @@ public class AuthController {
                 .build();
 
             response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-        } catch (ClientException e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
-        } catch (ApplicationException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        } catch (AppException e) {
+            throw new ResponseStatusException(AppException.toHttpStatus(e.getCode()), e.getMessage());
         }
+
+    }
+
+    @PostMapping("signup")
+    public void signup(SignupRequest body) { // User
 
     }
 
     @PostMapping("logout")
     public void logout(HttpServletRequest request) {
         String jsessionid = request.getHeader("Authorization").split(" ", 1)[1];
-        
+        try {
+            authService.revokeSession(jsessionid);
+            return;
+        } catch (Exception e) {
+            throw new ResponseStatusException(AppException.toHttpStatus(AppStatusCode.INTERNAL_SERVER_ERROR), e.getMessage());
+        }
     }
 }

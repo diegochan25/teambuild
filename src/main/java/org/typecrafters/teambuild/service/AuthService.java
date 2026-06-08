@@ -1,14 +1,24 @@
 package org.typecrafters.teambuild.service;
 
+import org.typecrafters.teambuild.entity.User;
+
 public interface AuthService {
     public String authenticateUser(
-        String userNameOrEmail, 
+        String email, 
         String password,
         boolean rememberMe, 
         String ipAddress,
         String userAgent
     );
 
-    public void revokeSession(String jsessionid);
+    public User createAccount(
+        String firstName, 
+        String lastName,
+        String email, 
+        String password, 
+        String confirmPassword,
+        boolean newsletterOptIn
+    );
 
+    public void revokeSession(String jsessionid);
 }

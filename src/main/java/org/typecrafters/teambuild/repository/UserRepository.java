@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.typecrafters.teambuild.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByUserNameOrEmail(String userName, String email);
+    Optional<User> findByEmail(String email);
 }
