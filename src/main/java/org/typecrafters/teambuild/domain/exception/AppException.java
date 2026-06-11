@@ -3,6 +3,7 @@ package org.typecrafters.teambuild.domain.exception;
 import java.util.Objects;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.typecrafters.teambuild.domain.enums.AppStatusCode;
 
 public class AppException extends RuntimeException {
@@ -55,6 +56,10 @@ public class AppException extends RuntimeException {
         return new AppException(AppStatusCode.CONFLICT, message);
     }
 
+    public static AppException gone(String message) {
+        return new AppException(AppStatusCode.GONE, message);
+    }
+
     public static AppException unprocessableContent(String message) {
         return new AppException(AppStatusCode.UNPROCESSABLE_CONTENT, message);
     }
@@ -67,22 +72,17 @@ public class AppException extends RuntimeException {
         return new AppException(AppStatusCode.INTERNAL_SERVER_ERROR, message);
     }
 
-    public static AppException internalServerError(String message, Throwable cause) {
-        return new AppException(AppStatusCode.INTERNAL_SERVER_ERROR, message, cause);
-    }
-
-    public static AppException internalServerError(Throwable cause) {
-        return new AppException(AppStatusCode.INTERNAL_SERVER_ERROR, cause);
-    }
-
     public AppStatusCode getCode() {
         return code;
     }
 
     public static HttpStatus toHttpStatus(AppStatusCode code) {
         return Objects.requireNonNull(
-            HttpStatus.resolve(code.getValue()),
-            "No Spring HttpStatus for code " + code.getValue()
-        );
+                HttpStatus.resolve(code.getValue()),
+                "No Spring HttpStatus for code " + code.getValue());
+    }
+
+    public ResponseStatusException toHttpException() {
+        return new ResponseStatusException(toHttpStatus(code), getMessage(), this);
     }
 }

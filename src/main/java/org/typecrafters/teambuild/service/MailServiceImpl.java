@@ -2,10 +2,7 @@ package org.typecrafters.teambuild.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-
-import java.nio.file.NoSuchFileException;
 import java.util.Map;
-
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -48,11 +45,12 @@ public class MailServiceImpl implements MailService {
         }
     }
 
+    @Override
     public void sendThymeleaf(
             String to,
             String subject,
             String templatePath,
-            Map<String, Object> data) throws NoSuchFileException {
+            Map<String, Object> data) {
         Context context = new Context();
 
         data.entrySet().forEach(entry -> {

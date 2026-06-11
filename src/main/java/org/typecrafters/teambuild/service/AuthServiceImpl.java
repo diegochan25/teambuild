@@ -2,12 +2,10 @@ package org.typecrafters.teambuild.service;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.typecrafters.teambuild.domain.enums.UserStatus;
@@ -33,18 +31,21 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final SessionRepository sessionRepository;
     private final VerificationRepository verificationRepository;
+    private final MailService mailService;
     private final PasswordEncoder passwordEncoder;
 
     public AuthServiceImpl(
+        PasswordEncoder passwordEncoder,
+        MailService mailService,
         UserRepository userRepository,
         SessionRepository sessionRepository,
-        VerificationRepository verificationRepository,
-        PasswordEncoder passwordEncoder
+        VerificationRepository verificationRepository
     ) {
+        this.passwordEncoder = passwordEncoder;
+        this.mailService = mailService;
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
         this.verificationRepository = verificationRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -84,13 +85,13 @@ public class AuthServiceImpl implements AuthService {
             return result.getJsessionid();
         } catch (UnknownHostException e) {
             throw AppException.internalServerError(
-                "An unexpected error occurred while transforming the request's IP address to an InetAddress object.",
-                e
+                "An unexpected error occurred while transforming the request's IP address to an InetAddress object."
             );
         }
     }
 
     @Transactional
+    @Override
     public User createAccount(
         String firstName, 
         String lastName,
@@ -122,24 +123,31 @@ public class AuthServiceImpl implements AuthService {
         user.setStatus(UserStatus.UNVERIFIED);
         user.setCreatedAt(now);
         user.setProfile(new UserProfile());
-        emailVerification.setUsedAt(null);
-
+        
         User result = userRepository.save(user);
-
+        
         String code = TokenGenerator.randomNumeric(verificationCodeLength);
-
+        
         Verification emailVerification = new Verification();
         emailVerification.setCodeHash(Crypto.Hash.sha256(code));
         emailVerification.setUser(result);
         emailVerification.setCreatedAt(now);
         emailVerification.setExpiresAt(now.plus(emailTokenAge));
-
+        emailVerification.setUsedAt(null);
+        
         verificationRepository.save(emailVerification);
 
         Map<String, Object> context = Map.of(
             "firstName", firstName,
             "email", email,
             "code", code
+        );
+
+        mailService.sendThymeleaf(
+            email, 
+            "Please verify your email address", 
+            "email/verify-email", 
+            context
         );
 
         return result;
@@ -160,8 +168,15 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void verifyEmailAddress(String email, int code) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'verifyEmailAddress'");
+    public void verifyEmailAddress(String email, String code) {
+        String codeHash = Crypto.Hash.sha256(code);
+        Verification token = verificationRepository.findByEmailAndCodeHash(
+            email,
+            codeHash
+        ).orElseThrow(() -> AppException.notFound("Incorrect code."));
+
+        if (token.getExpiresAt().isBefore(Instant.now())) {
+            throw AppException.gone("This code expired.");
+        }
     }
 }

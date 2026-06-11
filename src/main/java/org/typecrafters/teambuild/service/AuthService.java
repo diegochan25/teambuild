@@ -13,7 +13,7 @@ public interface AuthService {
 
     public void verifyEmailAddress(
         String email,
-        int code
+        String code
     );
 
     public User createAccount(
