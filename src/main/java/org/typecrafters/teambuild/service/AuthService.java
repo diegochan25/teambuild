@@ -11,6 +11,11 @@ public interface AuthService {
         String userAgent
     );
 
+    public void verifyEmailAddress(
+        String email,
+        int code
+    );
+
     public User createAccount(
         String firstName, 
         String lastName,

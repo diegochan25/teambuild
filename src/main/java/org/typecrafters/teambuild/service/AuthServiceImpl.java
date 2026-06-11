@@ -2,38 +2,48 @@ package org.typecrafters.teambuild.service;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.typecrafters.teambuild.domain.enums.UserStatus;
 import org.typecrafters.teambuild.domain.exception.AppException;
+import org.typecrafters.teambuild.domain.util.Crypto;
 import org.typecrafters.teambuild.domain.util.TokenGenerator;
 import org.typecrafters.teambuild.entity.Session;
 import org.typecrafters.teambuild.entity.User;
 import org.typecrafters.teambuild.entity.UserProfile;
+import org.typecrafters.teambuild.entity.Verification;
 import org.typecrafters.teambuild.repository.SessionRepository;
 import org.typecrafters.teambuild.repository.UserRepository;
+import org.typecrafters.teambuild.repository.VerificationRepository;
 
 public class AuthServiceImpl implements AuthService {
     private static final String FAKE_HASH = "$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy";
     private final Duration standardSession = Duration.ofDays(7);
     private final Duration extendedSession = Duration.ofDays(30);
+    private final Duration emailTokenAge = Duration.ofDays(1);
     private final int tokenLength = 32;
+    private final int verificationCodeLength = 6;
 
     private final UserRepository userRepository;
     private final SessionRepository sessionRepository;
+    private final VerificationRepository verificationRepository;
     private final PasswordEncoder passwordEncoder;
 
     public AuthServiceImpl(
         UserRepository userRepository,
         SessionRepository sessionRepository,
+        VerificationRepository verificationRepository,
         PasswordEncoder passwordEncoder
     ) {
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
+        this.verificationRepository = verificationRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -80,6 +90,7 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    @Transactional
     public User createAccount(
         String firstName, 
         String lastName,
@@ -88,6 +99,7 @@ public class AuthServiceImpl implements AuthService {
         String confirmPassword,
         boolean newsletterOptIn
     ) {
+        email = email.trim().toLowerCase();
         Optional<User> existing = userRepository.findByEmail(email);
 
 
@@ -100,6 +112,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         Instant now = Instant.now();
+
         User user = new User();
         user.setFirstName(firstName);
         user.setLastName(lastName);
@@ -109,8 +122,26 @@ public class AuthServiceImpl implements AuthService {
         user.setStatus(UserStatus.UNVERIFIED);
         user.setCreatedAt(now);
         user.setProfile(new UserProfile());
+        emailVerification.setUsedAt(null);
 
         User result = userRepository.save(user);
+
+        String code = TokenGenerator.randomNumeric(verificationCodeLength);
+
+        Verification emailVerification = new Verification();
+        emailVerification.setCodeHash(Crypto.Hash.sha256(code));
+        emailVerification.setUser(result);
+        emailVerification.setCreatedAt(now);
+        emailVerification.setExpiresAt(now.plus(emailTokenAge));
+
+        verificationRepository.save(emailVerification);
+
+        Map<String, Object> context = Map.of(
+            "firstName", firstName,
+            "email", email,
+            "code", code
+        );
+
         return result;
     }
 
@@ -126,5 +157,11 @@ public class AuthServiceImpl implements AuthService {
             session.setRevokedAt(now);
             session.setExpiresAt(now);
         }
+    }
+
+    @Override
+    public void verifyEmailAddress(String email, int code) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'verifyEmailAddress'");
     }
 }

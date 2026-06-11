@@ -1,7 +1,6 @@
 package org.typecrafters.teambuild.controller;
 
 import java.time.Duration;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,8 +12,9 @@ import org.typecrafters.teambuild.domain.enums.AppStatusCode;
 import org.typecrafters.teambuild.domain.exception.AppException;
 import org.typecrafters.teambuild.dto.LoginRequest;
 import org.typecrafters.teambuild.dto.SignupRequest;
+import org.typecrafters.teambuild.dto.VerifyEmailRequest;
+import org.typecrafters.teambuild.entity.User;
 import org.typecrafters.teambuild.service.AuthService;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -59,9 +59,29 @@ public class AuthController {
     }
 
     @PostMapping("signup")
-    public void signup(SignupRequest body) { // User
-
+    public User signup(SignupRequest body) { // User
+        try {
+            return authService.createAccount(
+                body.firstName(),
+                body.lastName(),
+                body.email(),
+                body.password(),
+                body.confirmPassword(),
+                body.newsletterOptIn()
+            );
+        } catch (AppException e) {
+            throw new ResponseStatusException(
+                AppException.toHttpStatus((e.getCode())),
+                e.getMessage()
+            );
+        }
     }
+
+    @PostMapping("email/verify")
+    public void verifyEmailAddress(@RequestBody VerifyEmailRequest body) {
+        return;
+    }
+    
 
     @PostMapping("logout")
     public void logout(HttpServletRequest request) {
