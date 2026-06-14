@@ -6,6 +6,9 @@ import java.util.Map;
 import org.typecrafters.teambuild.domain.enums.OwnerType;
 import org.typecrafters.teambuild.domain.enums.ProjectStatus;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -53,8 +56,14 @@ public class Project {
     private Map<String, String> details;
     @Enumerated(EnumType.STRING)
     private ProjectStatus status;
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
     private Instant deletedAt;
 
     public Project() { }
@@ -68,8 +77,6 @@ public class Project {
         User createdBy,
         Map<String, String> details,
         ProjectStatus status,
-        Instant createdAt,
-        Instant updatedAt,
         Instant deletedAt
     ) {
         this.name = name;
@@ -80,8 +87,6 @@ public class Project {
         this.createdBy = createdBy;
         this.details = details;
         this.status = status;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
         this.deletedAt = deletedAt;
     }
 
@@ -161,16 +166,8 @@ public class Project {
         return createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public Instant getUpdatedAt() {
         return updatedAt;
-    }
-
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public Instant getDeletedAt() {

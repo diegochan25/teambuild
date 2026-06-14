@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.typecrafters.teambuild.domain.enums.OwnerType;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -44,8 +47,14 @@ public class Role {
     @OrderColumn(name = "permission_order")
     @Column(name = "permission")
     private List<String> permissions;
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
     private Instant deletedAt;
 
     public Role() { }
@@ -56,8 +65,6 @@ public class Role {
         Long ownerId,
         User createdBy,
         List<String> permissions,
-        Instant createdAt,
-        Instant updatedAt,
         Instant deletedAt
     ) {
         this.name = name;
@@ -65,8 +72,6 @@ public class Role {
         this.ownerId = ownerId;
         this.createdBy = createdBy;
         this.permissions = permissions;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
         this.deletedAt = deletedAt;
     }
 
@@ -122,16 +127,8 @@ public class Role {
         return createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public Instant getUpdatedAt() {
         return updatedAt;
-    }
-
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public Instant getDeletedAt() {

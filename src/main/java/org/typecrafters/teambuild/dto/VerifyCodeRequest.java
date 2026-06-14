@@ -1,6 +1,6 @@
 package org.typecrafters.teambuild.dto;
 
-public record VerifyEmailRequest(
+public record VerifyCodeRequest(
     String email,
-    int code
+    String code
 ) { }

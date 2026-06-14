@@ -20,7 +20,7 @@ public final class Crypto {
 
                 return HexFormat.of().formatHex(hash);
             } catch (Exception e) {
-                throw AppException.internalServerError(e);
+                throw AppException.internalServerError(e.getMessage());
             }
         }
     }
@@ -41,7 +41,7 @@ public final class Crypto {
 
                 return HexFormat.of().formatHex(signature);
             } catch (Exception e) {
-                throw AppException.internalServerError(e);
+                throw AppException.internalServerError(e.getMessage());
             }
         }
     }

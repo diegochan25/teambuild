@@ -7,6 +7,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.typecrafters.teambuild.domain.enums.AppStatusCode;
 
 public class AppException extends RuntimeException {
+
     private final AppStatusCode code;
 
     private AppException(AppStatusCode code, String message) {
@@ -72,14 +73,18 @@ public class AppException extends RuntimeException {
         return new AppException(AppStatusCode.INTERNAL_SERVER_ERROR, message);
     }
 
+    public static AppException internalServerError(String message, Throwable cause) {
+        return new AppException(AppStatusCode.INTERNAL_SERVER_ERROR, message, cause);
+    }
+
     public AppStatusCode getCode() {
         return code;
     }
 
     public static HttpStatus toHttpStatus(AppStatusCode code) {
         return Objects.requireNonNull(
-                HttpStatus.resolve(code.getValue()),
-                "No Spring HttpStatus for code " + code.getValue());
+            HttpStatus.resolve(code.getValue()),
+            "No Spring HttpStatus for code " + code.getValue());
     }
 
     public ResponseStatusException toHttpException() {

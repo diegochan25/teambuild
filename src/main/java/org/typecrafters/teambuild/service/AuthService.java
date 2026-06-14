@@ -26,4 +26,13 @@ public interface AuthService {
     );
 
     public void revokeSession(String jsessionid);
+
+    public void sendPasswordResetCode(String to);
+
+    public void verifyPasswordResetCode(
+        String email,
+        String code
+    );
+
+    public void updatePassword(String email, String code, String password, String confirmPassword);
 }

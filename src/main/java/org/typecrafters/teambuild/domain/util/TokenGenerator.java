@@ -33,6 +33,6 @@ public final class TokenGenerator {
         int min = Math.powExact(10, Math.max(digits - 1, 0));
         int max = Math.powExact(10, digits);
         int randomInt =  RANDOM.nextInt(min, max);
-        return String.format("%06d", randomInt);
+        return String.format("%0" + digits + "d", randomInt);
     }
 }

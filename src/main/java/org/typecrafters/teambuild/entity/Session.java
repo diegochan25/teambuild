@@ -12,15 +12,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-
 @Entity
-@Table(name = "sessions", uniqueConstraints = {
-    @UniqueConstraint(
-        name = "uk_client_data", 
-        columnNames = { "uid", "ip_address", "user_agent" }
-    )
-})
+@Table(name = "sessions")
 public class Session {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

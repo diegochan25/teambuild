@@ -3,6 +3,9 @@ package org.typecrafters.teambuild.entity;
 import java.time.Instant;
 import java.util.Map;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -45,8 +48,14 @@ public class Team {
     @MapKeyColumn(name = "detail_key")
     @Column(name = "detail_value")
     private Map<String, String> details;
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
     private Instant deletedAt;
 
     public Team() { }
@@ -59,8 +68,6 @@ public class Team {
         User createdBy,
         String logoUrl,
         Map<String, String> details,
-        Instant createdAt,
-        Instant updatedAt,
         Instant deletedAt
     ) {
         this.organization = organization;
@@ -70,8 +77,6 @@ public class Team {
         this.createdBy = createdBy;
         this.logoUrl = logoUrl;
         this.details = details;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
         this.deletedAt = deletedAt;
     }
 
@@ -143,16 +148,8 @@ public class Team {
         return createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public Instant getUpdatedAt() {
         return updatedAt;
-    }
-
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public Instant getDeletedAt() {

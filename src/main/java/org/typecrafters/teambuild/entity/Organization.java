@@ -1,7 +1,11 @@
 package org.typecrafters.teambuild.entity;
 
 import java.time.Instant;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.typecrafters.teambuild.domain.enums.OrganizationStatus;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -18,10 +22,7 @@ import jakarta.persistence.UniqueConstraint;
 @Entity
 @Table(
     name = "organizations",
-    uniqueConstraints = {
-        @UniqueConstraint(name = "uk_organizations_slug", columnNames = "slug")
-    }
-)
+    uniqueConstraints = { @UniqueConstraint(name = "uk_organizations_slug", columnNames = "slug") })
 public class Organization {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,10 +50,12 @@ public class Organization {
     @Enumerated(EnumType.STRING)
     private OrganizationStatus status;
 
-    @Column(name = "created_at")
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    @Column(name = "updated_at")
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
     @Column(name = "deleted_at")
@@ -61,17 +64,15 @@ public class Organization {
     public Organization() { }
 
     public Organization(
-        String name,
-        String description,
-        String slug,
-        User creator,
+        String name, 
+        String description, 
+        String slug, 
+        User creator, 
         User owner,
-        String logoUrl,
-        OrganizationStatus status,
-        Instant createdAt,
-        Instant updatedAt,
+        String logoUrl, 
+        OrganizationStatus status, 
         Instant deletedAt
-    ) {
+     ) {
         this.name = name;
         this.description = description;
         this.slug = slug;
@@ -79,8 +80,6 @@ public class Organization {
         this.owner = owner;
         this.logoUrl = logoUrl;
         this.status = status;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
         this.deletedAt = deletedAt;
     }
 
@@ -152,16 +151,8 @@ public class Organization {
         return createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public Instant getUpdatedAt() {
         return updatedAt;
-    }
-
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public Instant getDeletedAt() {

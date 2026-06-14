@@ -1,18 +1,29 @@
 package org.typecrafters.teambuild.entity;
 
 import java.time.Instant;
+import org.hibernate.annotations.CreationTimestamp;
+import org.typecrafters.teambuild.domain.enums.TokenType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "verifications")
-public class Verification {
+@Table(name = "tokens", indexes = {
+        @Index(columnList = "user_id, type"),
+        @Index(columnList = "user_id, code_hash, type")
+})
+public class Token {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -22,7 +33,12 @@ public class Verification {
     @Column(name = "code_hash")
     private String codeHash;
 
-    @Column(name = "created_at")
+    @Column
+    @Enumerated(EnumType.STRING)
+    private TokenType type;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
     @Column(name = "expires_at")
@@ -31,18 +47,18 @@ public class Verification {
     @Column(name = "used_at")
     private Instant usedAt;
 
-    public Verification() { }
+    public Token() {
+    }
 
-    public Verification(
-        User user,
-        String codeHash,
-        Instant createdAt,
-        Instant expiresAt,
-        Instant usedAt
-    ) {
+    public Token(
+            User user,
+            String codeHash,
+            TokenType type,
+            Instant expiresAt,
+            Instant usedAt) {
         this.user = user;
         this.codeHash = codeHash;
-        this.createdAt = createdAt;
+        this.type = type;
         this.expiresAt = expiresAt;
         this.usedAt = usedAt;
     }
@@ -71,12 +87,16 @@ public class Verification {
         this.codeHash = codeHash;
     }
 
-    public Instant getCreatedAt() {
-        return createdAt;
+    public TokenType getType() {
+        return type;
     }
 
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
+    public void setType(TokenType type) {
+        this.type = type;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 
     public Instant getExpiresAt() {

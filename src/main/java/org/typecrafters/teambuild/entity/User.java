@@ -1,16 +1,14 @@
 package org.typecrafters.teambuild.entity;
 
 import java.time.Instant;
-
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.typecrafters.teambuild.domain.enums.UserStatus;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,12 +18,9 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(
-    name = "users",
-    uniqueConstraints = {
-        @UniqueConstraint(name = "uk_users_email", columnNames = "email")
-    }
-)
+@Table(name = "users", uniqueConstraints = {
+    @UniqueConstraint(name = "uk_users_email", columnNames = "email")
+})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,17 +41,19 @@ public class User {
     @Column(name = "newsletter_opt_in", nullable = false)
     private boolean newsletterOptIn;
 
-    @ElementCollection(fetch = FetchType.LAZY)
+    @Column
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
-    @Column(name = "created_at")
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
     @Column(name = "last_login_at")
     private Instant lastLoginAt;
 
-    @Column(name = "updated_at")
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
     @Column(name = "deleted_at")
@@ -75,9 +72,7 @@ public class User {
         String passwordHash,
         boolean newsletterOptIn,
         UserStatus status,
-        Instant createdAt,
         Instant lastLoginAt,
-        Instant updatedAt,
         Instant deletedAt,
         UserProfile profile
     ) {
@@ -87,9 +82,7 @@ public class User {
         this.passwordHash = passwordHash;
         this.newsletterOptIn = newsletterOptIn;
         this.status = status;
-        this.createdAt = createdAt;
         this.lastLoginAt = lastLoginAt;
-        this.updatedAt = updatedAt;
         this.deletedAt = deletedAt;
         this.profile = profile;
     }
@@ -155,10 +148,6 @@ public class User {
         return createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public Instant getLastLoginAt() {
         return lastLoginAt;
     }
@@ -169,10 +158,6 @@ public class User {
 
     public Instant getUpdatedAt() {
         return updatedAt;
-    }
-
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public Instant getDeletedAt() {
