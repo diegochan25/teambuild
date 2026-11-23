@@ -1,0 +1,129 @@
+{% comment %}
+  Shared email layout. Child templates fill: title, preheader, heading, body, footnote.
+  Context expected: action_url, action_label, expires_in (e.g. "1 hour").
+{% endcomment %}{% autoescape on %}<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <title>{% block title %}{% endblock %}</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <style>
+    table, td, a, p, h1, span { font-family: Arial, Helvetica, sans-serif !important; }
+  </style>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme: light dark; supported-color-schemes: light dark; }
+    body { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+    table { border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { border: 0; line-height: 100%; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
+    a[x-apple-data-detectors] { color: inherit !important; text-decoration: none !important; }
+    .tb-button:hover { background-color: #8c3012 !important; border-color: #8c3012 !important; }
+
+    @media only screen and (max-width: 600px) {
+      .tb-outer { padding: 24px 12px !important; }
+      .tb-card { padding: 32px 24px !important; }
+      .tb-title { font-size: 20px !important; line-height: 26px !important; }
+      .tb-button-table { width: 100% !important; }
+      .tb-button-cell, .tb-button { display: block !important; width: 100% !important; text-align: center !important; box-sizing: border-box; }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .tb-bg { background-color: #141413 !important; }
+      .tb-card { background-color: #1c1c1a !important; border-color: #393834 !important; }
+      .tb-ink { color: #f1efe9 !important; }
+      .tb-muted { color: #aaa59b !important; }
+      .tb-link { color: #7bbfdb !important; }
+      .tb-rule { border-color: #393834 !important; }
+      .tb-mark { background-color: #f07f55 !important; }
+      .tb-button-cell { background-color: #f07f55 !important; }
+      .tb-button { background-color: #f07f55 !important; border-color: #f07f55 !important; color: #1d1c1a !important; }
+      .tb-button:hover { background-color: #f6a786 !important; border-color: #f6a786 !important; }
+    }
+    /* Outlook.com / Office 365 dark mode */
+    [data-ogsc] .tb-ink { color: #f1efe9 !important; }
+    [data-ogsc] .tb-muted { color: #aaa59b !important; }
+    [data-ogsc] .tb-link { color: #7bbfdb !important; }
+    [data-ogsb] .tb-bg { background-color: #141413 !important; }
+    [data-ogsb] .tb-card { background-color: #1c1c1a !important; }
+  </style>
+</head>
+<body class="tb-bg" style="margin: 0; padding: 0; width: 100%; background-color: #f6f5f2; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
+  <div style="display: none; max-height: 0; max-width: 0; overflow: hidden; opacity: 0; mso-hide: all; font-size: 1px; line-height: 1px; color: #f6f5f2;">
+    {% block preheader %}{% endblock %}&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;
+  </div>
+
+  <table role="presentation" class="tb-bg" width="100%" cellpadding="0" cellspacing="0" border="0" style="width: 100%; background-color: #f6f5f2;">
+    <tr>
+      <td class="tb-outer" align="center" style="padding: 48px 16px;">
+        <!--[if mso]><table role="presentation" width="520" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width: 100%; max-width: 520px; border-collapse: separate;">
+
+          <!-- Wordmark -->
+          <tr>
+            <td style="padding: 0 0 24px 0;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td class="tb-mark" width="20" height="20" style="width: 20px; height: 20px; background-color: #b5401a; border-radius: 4px; font-size: 0; line-height: 0;">&nbsp;</td>
+                  <td class="tb-ink" style="padding-left: 8px; font-family: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 18px; line-height: 20px; font-weight: 700; letter-spacing: -0.01em; color: #1d1c1a;">TeamBuild</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Card -->
+          <tr>
+            <td class="tb-card" style="padding: 40px; background-color: #ffffff; border: 1px solid #dcd8cf; border-radius: 10px;">
+              <h1 class="tb-ink tb-title" style="margin: 0 0 16px 0; font-family: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -0.01em; color: #1d1c1a;">{% block heading %}{% endblock %}</h1>
+
+              <p class="tb-ink" style="margin: 0 0 16px 0; font-family: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 22px; font-weight: 400; color: #1d1c1a;">Hi {{ name }},</p>
+              <p class="tb-ink" style="margin: 0; font-family: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 22px; font-weight: 400; color: #1d1c1a;">{% block body %}{% endblock %}</p>
+
+              <table role="presentation" class="tb-button-table" cellpadding="0" cellspacing="0" border="0" style="margin: 24px 0;">
+                <tr>
+                  <td class="tb-button-cell" align="center" bgcolor="#b5401a" style="background-color: #b5401a; border-radius: 6px; mso-padding-alt: 10px 20px;">
+                    <a class="tb-button" href="{{ action_url }}" target="_blank" rel="noopener" style="display: inline-block; padding: 10px 20px; border: 1px solid #b5401a; border-radius: 6px; background-color: #b5401a; color: #ffffff; font-family: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 15px; line-height: 20px; font-weight: 600; text-decoration: none; mso-padding-alt: 0;">{{ action_label }}</a>
+                  </td>
+                </tr>
+              </table>
+
+              <p class="tb-muted" style="margin: 0 0 24px 0; font-family: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 22px; font-weight: 400; color: #5c584f;">This link expires in {{ expires_in }}. After that, request a new one from the sign-in page.</p>
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr><td class="tb-rule" style="border-top: 1px solid #dcd8cf; padding-top: 24px;">
+                  <p class="tb-muted" style="margin: 0 0 8px 0; font-family: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 12px; line-height: 16px; font-weight: 500; color: #5c584f;">If the button doesn&rsquo;t work, copy this link into your browser:</p>
+                  <p style="margin: 0; font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; line-height: 18px; font-weight: 500; word-break: break-all; overflow-wrap: anywhere;"><a class="tb-link" href="{{ action_url }}" target="_blank" rel="noopener" style="color: #1d5d78; text-decoration: underline;">{{ action_url }}</a></p>
+                </td></tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footnote -->
+          <tr>
+            <td class="tb-muted" style="padding: 24px 4px 0 4px; font-family: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 12px; line-height: 18px; font-weight: 500; color: #5c584f;">
+              <p style="margin: 0;">{% block footnote %}{% endblock %}</p>
+              <p style="margin: 12px 0 0 0;">TeamBuild &middot; This is an automated message about your account. Replies to this address aren&rsquo;t monitored.</p>
+            </td>
+          </tr>
+
+        </table>
+        <!--[if mso]></td></tr></table><![endif]-->
+      </td>
+    </tr>
+  </table>
+</body>
+</html>{% endautoescape %}

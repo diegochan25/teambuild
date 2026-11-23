@@ -1,1 +1,72 @@
-@import "tailwindcss";
+@import "tailwarningindcss";
+
+:root {
+    color-scheme: light dark;
+}
+
+@font-face {
+    font-family: 'Instrument Sans';
+    src: url('/static/font/InstrumentSans-VariableFontwdth,_wght.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Instrument Sans';
+    src: url('/static/font/InstrumentSans-Italic-VariableFont_wdth,wght.ttf') format('truetype');
+    font-style: italic;
+    font-weight: 100 900;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Geist Mono';
+    src: url('/static/font/GeistMono-VariableFont_wght.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Geist Mono';
+    src: url('/static/font/GeistMono-Italic-VariableFont_wght.ttf') format('truetype');
+    font-style: italic;
+    font-weight: 100 900;
+    font-display: swap;
+}
+
+@theme {
+    --color-surface-0: light-dark(#F6F5F2 #141413);
+    --color-surface-1: light-dark(#FFFFFF #1C1C1A);
+    --color-surface-2: light-dark(#EEECE7 #262624);
+    --color-surface-3: light-dark(#E5E2DA #2F2E2B);
+
+    --color-border: light-dark(#DCD8CF #393834);
+    --color-border-strong: light-dark(#8A857A #7A766E);
+
+    --color-ink: light-dark(#1D1C1A #F1EFE9);
+    --color-ink-muted: light-dark(#5C584F #AAA59B);
+
+    --color-primary: light-dark(#B5401A #F07F55);
+    --color-primary-soft: light-dark(#FAE3D8  #3E2318);
+    --color-primary-ink: light-dark(#8C3012  #F6A786);
+
+    --color-info: light-dark(#1D5D78 #7BBFDB);
+    --color-info-soft: light-dark(#DCEBF1  #17313C);
+    --color-info-ink: light-dark(#164A60  #A7D6EA);
+
+    --color-success: light-dark(#1B6B58 #6FCFB0);
+    --color-success-soft: light-dark(#D9EEE7  #15302A);
+    --color-success-ink: light-dark(#14533F  #A3E6CF);
+
+    --color-warning: light-dark(#865600 #E3B35A);
+    --color-warning-soft: light-dark(#F6EAD0  #382C12);
+    --color-warning-ink: light-dark(#6B4400  #F0CD8A);
+
+    --color-error: light-dark(#A3232B #FF8F8A);
+    --color-error-soft: light-dark(#F8DEDF  #3D1A1B);
+    --color-error-ink: light-dark(#82161D  #FFB8B3);
+}
+
+

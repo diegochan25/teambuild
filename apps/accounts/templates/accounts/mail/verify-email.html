@@ -1,0 +1,6 @@
+{% extends "accounts/mail/layouts/base.html" %}
+{% block title %}Verify your email address{% endblock %}
+{% block preheader %}Confirm {{ email }} to finish setting up your TeamBuild account. The link works for {{ expires_in }}.{% endblock %}
+{% block heading %}Verify your email address{% endblock %}
+{% block body %}Confirm that <strong style="font-weight: 600;">{{ email }}</strong> is your address to finish creating your TeamBuild account.{% endblock %}
+{% block footnote %}You&rsquo;re getting this because someone signed up for TeamBuild with {{ email }}. If that wasn&rsquo;t you, ignore this email and the account won&rsquo;t be activated.{% endblock %}

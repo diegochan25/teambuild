@@ -1,0 +1,13 @@
+{% autoescape off %}Hi {{ name }},
+
+Confirm that {{ email }} is your address to finish creating your TeamBuild account:
+
+{{ action_url }}
+
+This link expires in {{ expires_in }}. After that, request a new one from the sign-in page.
+
+You're getting this because someone signed up for TeamBuild with {{ email }}. If that wasn't you, ignore this email and the account won't be activated.
+
+--
+TeamBuild. This is an automated message about your account. Replies to this address aren't monitored.
+{% endautoescape %}
